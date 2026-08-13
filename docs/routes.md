@@ -1,19 +1,16 @@
 # Routes
 
 ## Global
-
 - `/splash`
 - `/onboarding`
 
 ## Auth
-
 - `/auth/login`
 - `/auth/activate`
 - `/auth/forgot-password`
 - `/auth/reset-password`
 
 ## Client
-
 - `/client/home`
 - `/client/card`
 - `/client/history`
@@ -25,7 +22,6 @@
 - `/client/profile/edit`
 
 ## Admin
-
 - `/admin/dashboard`
 - `/admin/clients`
 - `/admin/clients/new`
@@ -44,27 +40,3 @@
 - `/admin/analytics/clients`
 - `/admin/loyalty`
 - `/admin/more`
-- `/admin/more/business`
-- `/admin/more/notifications`
-- `/admin/more/account`
-- `/admin/more/settings`
-
-## Guards
-
-### Client routes
-
-Las rutas `/client/*` requieren:
-
-```text
-role == client
-```
-
-### Admin routes
-
-Las rutas `/admin/*` requieren:
-
-```text
-role == admin
-```
-
-Si el usuario intenta acceder a una ruta no autorizada debe ser redirigido a su home correspondiente.
