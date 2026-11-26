@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
@@ -29,6 +32,17 @@ class AppState extends ChangeNotifier {
   List<RecentActivityRecord> recentActivity = <RecentActivityRecord>[];
   List<AppointmentRecord> appointments = <AppointmentRecord>[];
   BusinessMetrics metrics = BusinessMetrics.empty;
+
+  // In-flight bootstrap, shared by concurrent callers so several quick
+  // actions never trigger several full reloads at once.
+  Future<void>? _bootstrapInFlight;
+  bool _bootstrapQueued = false;
+
+  // Last appointments payload, to skip redraws when nothing changed.
+  String? _appointmentsSignature;
+
+  RealtimeChannel? _appointmentsChannel;
+  Timer? _appointmentsDebounce;
 
   bool get isAuthenticated => supabase.auth.currentSession != null;
   bool get needsBusinessSetup => isAuthenticated && business == null;
@@ -67,6 +81,7 @@ class AppState extends ChangeNotifier {
   }
 
   Future<void> logout() async {
+    await _stopRealtime();
     await supabase.auth.signOut();
     business = null;
     memberRole = null;
@@ -79,6 +94,7 @@ class AppState extends ChangeNotifier {
     reminderClients = [];
     recentActivity = [];
     appointments = [];
+    _appointmentsSignature = null;
     metrics = BusinessMetrics.empty;
     notifyListeners();
   }
@@ -110,7 +126,29 @@ class AppState extends ChangeNotifier {
     }
   }
 
-  Future<void> refreshAdminData() async {
+  /// Reloads the whole admin dashboard in ONE request.
+  ///
+  /// Calls made while a reload is running do not start another request: they
+  /// wait for one follow-up reload, so the latest change is always included.
+  Future<void> refreshAdminData() {
+    final running = _bootstrapInFlight;
+    if (running != null) {
+      _bootstrapQueued = true;
+      return running;
+    }
+
+    final future = _runBootstrap().whenComplete(() {
+      _bootstrapInFlight = null;
+      if (_bootstrapQueued) {
+        _bootstrapQueued = false;
+        refreshAdminData();
+      }
+    });
+    _bootstrapInFlight = future;
+    return future;
+  }
+
+  Future<void> _runBootstrap() async {
     if (supabase.auth.currentUser == null) return;
 
     try {
@@ -187,12 +225,25 @@ class AppState extends ChangeNotifier {
           })
           .toList();
 
-      reminderClients =
-          (data['reminder_clients'] as List<dynamic>? ?? [])
-              .map((row) => ClientRecord.fromDashboard(
-                    Map<String, dynamic>.from(row as Map),
-                  ))
-              .toList();
+      final reminderIds = data['reminder_client_ids'] as List<dynamic>?;
+      if (reminderIds != null) {
+        // v3 bootstrap: ids only, the full record is already in `clients`.
+        final byId = <String, ClientRecord>{
+          for (final client in clients) client.id: client,
+        };
+        reminderClients = reminderIds
+            .map((id) => byId[id as String])
+            .whereType<ClientRecord>()
+            .toList();
+      } else {
+        // Older database without migration 015.
+        reminderClients =
+            (data['reminder_clients'] as List<dynamic>? ?? [])
+                .map((row) => ClientRecord.fromDashboard(
+                      Map<String, dynamic>.from(row as Map),
+                    ))
+                .toList();
+      }
 
       recentActivity =
           (data['recent_activity'] as List<dynamic>? ?? [])
@@ -208,16 +259,11 @@ class AppState extends ChangeNotifier {
       final appointmentRows =
           data['appointments'] as List<dynamic>?;
       if (appointmentRows != null) {
-        appointments = appointmentRows
-            .map(
-              (row) => AppointmentRecord.fromMap(
-                Map<String, dynamic>.from(row as Map),
-              ),
-            )
-            .toList();
+        _setAppointments(appointmentRows);
       }
 
       errorMessage = null;
+      _startRealtime();
     } catch (error) {
       errorMessage = 'Error cargando los datos: $error';
     }
@@ -266,8 +312,7 @@ class AppState extends ChangeNotifier {
   }
 
   Future<void> loadClientDetail(String clientId) async {
-    final client = clientById(clientId);
-    if (client == null) return;
+    if (clientById(clientId) == null) return;
 
     try {
       final raw = await supabase.rpc(
@@ -276,6 +321,11 @@ class AppState extends ChangeNotifier {
       );
 
       final data = Map<String, dynamic>.from(raw as Map);
+
+      // Look the client up AFTER the request: a dashboard reload running in
+      // parallel may have replaced the list in the meantime.
+      final client = clientById(clientId);
+      if (client == null) return;
 
       client.history
         ..clear()
@@ -344,8 +394,10 @@ class AppState extends ChangeNotifier {
         'email': email.trim().isEmpty ? null : email.trim(),
       }).eq('id', clientId);
 
-      await refreshAdminData();
-      await loadClientDetail(clientId);
+      await Future.wait([
+        refreshAdminData(),
+        loadClientDetail(clientId),
+      ]);
       return true;
     } catch (error) {
       errorMessage = 'No se pudo editar la clienta: $error';
@@ -361,8 +413,10 @@ class AppState extends ChangeNotifier {
         params: {'p_client_id': clientId},
       );
 
-      await refreshAdminData();
-      await loadArchivedEntities();
+      await Future.wait([
+        refreshAdminData(),
+        loadArchivedEntities(),
+      ]);
 
       return Map<String, dynamic>.from(raw as Map);
     } catch (error) {
@@ -378,8 +432,10 @@ class AppState extends ChangeNotifier {
         'restore_client',
         params: {'p_client_id': clientId},
       );
-      await refreshAdminData();
-      await loadArchivedEntities();
+      await Future.wait([
+        refreshAdminData(),
+        loadArchivedEntities(),
+      ]);
       return true;
     } catch (error) {
       errorMessage = 'No se pudo restaurar la clienta: $error';
@@ -460,8 +516,10 @@ class AppState extends ChangeNotifier {
         params: {'p_service_id': serviceId},
       );
 
-      await refreshAdminData();
-      await loadArchivedEntities();
+      await Future.wait([
+        refreshAdminData(),
+        loadArchivedEntities(),
+      ]);
 
       return Map<String, dynamic>.from(raw as Map);
     } catch (error) {
@@ -478,8 +536,10 @@ class AppState extends ChangeNotifier {
         params: {'p_service_id': serviceId},
       );
 
-      await refreshAdminData();
-      await loadArchivedEntities();
+      await Future.wait([
+        refreshAdminData(),
+        loadArchivedEntities(),
+      ]);
       return true;
     } catch (error) {
       errorMessage = 'No se pudo restaurar el servicio: $error';
@@ -586,8 +646,10 @@ class AppState extends ChangeNotifier {
         },
       );
 
-      await refreshAdminData();
-      await loadClientDetail(clientId);
+      await Future.wait([
+        refreshAdminData(),
+        loadClientDetail(clientId),
+      ]);
 
       return Map<String, dynamic>.from(result as Map);
     } catch (error) {
@@ -616,8 +678,10 @@ class AppState extends ChangeNotifier {
         },
       );
 
-      await refreshAdminData();
-      await loadClientDetail(clientId);
+      await Future.wait([
+        refreshAdminData(),
+        loadClientDetail(clientId),
+      ]);
 
       return Map<String, dynamic>.from(result as Map);
     } catch (error) {
@@ -744,14 +808,13 @@ class AppState extends ChangeNotifier {
         params: {'p_business_id': business!.id},
       );
 
-      appointments = (raw as List<dynamic>)
-          .map((row) => AppointmentRecord.fromMap(
-                Map<String, dynamic>.from(row as Map),
-              ))
-          .toList();
-
+      final changed = _setAppointments(raw as List<dynamic>);
+      final hadError = errorMessage != null;
       errorMessage = null;
-      notifyListeners();
+
+      // Background syncs used to redraw the whole app every 3 seconds even
+      // when nothing had changed. Now they only redraw on real changes.
+      if (changed || hadError) notifyListeners();
     } catch (error) {
       errorMessage = 'No se pudieron cargar los turnos: $error';
       notifyListeners();
@@ -778,7 +841,7 @@ class AppState extends ChangeNotifier {
         },
       );
 
-      await loadAppointments();
+      // The bootstrap already includes the appointments.
       await refreshAdminData();
       return true;
     } catch (error) {
@@ -811,7 +874,7 @@ class AppState extends ChangeNotifier {
         },
       );
 
-      await loadAppointments();
+      // The bootstrap already includes the appointments.
       await refreshAdminData();
       return true;
     } catch (error) {
@@ -841,9 +904,12 @@ class AppState extends ChangeNotifier {
 
       // refreshAdminData rebuilds the client summaries, therefore reload the
       // selected client's real history/rewards afterwards.
-      await loadAppointments();
-      await refreshAdminData();
-      await loadClientDetail(clientId);
+      // The bootstrap already includes the appointments: one request for
+      // the dashboard plus the client's detail, in parallel.
+      await Future.wait([
+        refreshAdminData(),
+        loadClientDetail(clientId),
+      ]);
 
       errorMessage = null;
       notifyListeners();
@@ -872,7 +938,7 @@ class AppState extends ChangeNotifier {
         'status': status,
       }).eq('id', appointmentId);
 
-      await loadAppointments();
+      // The bootstrap already includes the appointments.
       await refreshAdminData();
       return true;
     } catch (error) {
@@ -891,7 +957,7 @@ class AppState extends ChangeNotifier {
         params: {'p_appointment_id': appointmentId},
       );
 
-      await loadAppointments();
+      // The bootstrap already includes the appointments.
       await refreshAdminData();
 
       return Map<String, dynamic>.from(raw as Map);
@@ -940,6 +1006,65 @@ class AppState extends ChangeNotifier {
       notifyListeners();
       return false;
     }
+  }
+
+  /// Replaces the appointments list. Returns false if it was identical.
+  bool _setAppointments(List<dynamic> rows) {
+    final signature = jsonEncode(rows);
+    if (signature == _appointmentsSignature) return false;
+
+    _appointmentsSignature = signature;
+    appointments = rows
+        .map(
+          (row) => AppointmentRecord.fromMap(
+            Map<String, dynamic>.from(row as Map),
+          ),
+        )
+        .toList();
+    return true;
+  }
+
+  /// Listens to appointment changes of this business through Supabase
+  /// Realtime (RLS limits it to the admin's own business). A burst of
+  /// changes triggers a single reload.
+  void _startRealtime() {
+    final businessId = business?.id;
+    if (businessId == null || _appointmentsChannel != null) return;
+
+    _appointmentsChannel = supabase
+        .channel('appointments:$businessId')
+        .onPostgresChanges(
+          event: PostgresChangeEvent.all,
+          schema: 'public',
+          table: 'appointments',
+          filter: PostgresChangeFilter(
+            type: PostgresChangeFilterType.eq,
+            column: 'business_id',
+            value: businessId,
+          ),
+          callback: (_) {
+            _appointmentsDebounce?.cancel();
+            _appointmentsDebounce = Timer(
+              const Duration(milliseconds: 400),
+              loadAppointments,
+            );
+          },
+        )
+        .subscribe();
+  }
+
+  Future<void> _stopRealtime() async {
+    _appointmentsDebounce?.cancel();
+    _appointmentsDebounce = null;
+    final channel = _appointmentsChannel;
+    _appointmentsChannel = null;
+    if (channel != null) await supabase.removeChannel(channel);
+  }
+
+  @override
+  void dispose() {
+    _stopRealtime();
+    super.dispose();
   }
 
   Future<bool> registerAdminPushSubscription(

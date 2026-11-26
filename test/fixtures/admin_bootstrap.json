@@ -1,0 +1,188 @@
+{
+    "role": "owner",
+    "clients": [
+        {
+            "id": "629bda69-50ef-4cce-bdcf-dcfbabf43b64",
+            "email": null,
+            "phone": null,
+            "points": 2,
+            "last_name": "Pérez",
+            "first_name": "Ana",
+            "public_token": "3bf78349-6c8c-4e26-a64a-74bb3fd1b01c",
+            "service_count": 7,
+            "last_service_at": "2026-11-26T15:03:40.121087+00:00",
+            "available_rewards": 0
+        }
+    ],
+    "loyalty": {
+        "id": "8bc7d171-912c-4690-bd5c-35bf82e41c48",
+        "active": true,
+        "created_at": "2026-11-26T15:03:40.121087+00:00",
+        "updated_at": "2026-11-26T15:03:40.121087+00:00",
+        "business_id": "944d9a28-ebf9-47e5-8d7e-da7860ff87ae",
+        "reward_percent": 20.00,
+        "points_required": 5
+    },
+    "metrics": {
+        "revenue": 136000.00,
+        "client_count": 1,
+        "service_count": 7,
+        "available_rewards": 0,
+        "revenue_this_month": 136000.00,
+        "services_this_month": 7,
+        "upcoming_appointments": 2
+    },
+    "business": {
+        "id": "944d9a28-ebf9-47e5-8d7e-da7860ff87ae",
+        "name": "Test Studio",
+        "phone": null,
+        "active": true,
+        "logo_url": null,
+        "created_at": "2026-11-26T15:03:40.121087+00:00",
+        "updated_at": "2026-11-26T15:03:40.121087+00:00",
+        "primary_color_hex": "#8F5E78",
+        "appointment_slot_minutes": 30
+    },
+    "services": [
+        {
+            "id": "fd3c4e0f-c798-4e50-83b1-afbe5d227f24",
+            "name": "Lifting",
+            "active": true,
+            "created_at": "2026-11-26T15:03:40.121087+00:00",
+            "updated_at": "2026-11-26T15:03:40.121087+00:00",
+            "archived_at": null,
+            "business_id": "944d9a28-ebf9-47e5-8d7e-da7860ff87ae",
+            "default_price": 20000.00,
+            "loyalty_points": 1
+        }
+    ],
+    "appointments": [
+        {
+            "id": "709caeea-b095-4fa6-8867-0946bac5daee",
+            "notes": null,
+            "source": "client",
+            "status": "requested",
+            "client_id": "629bda69-50ef-4cce-bdcf-dcfbabf43b64",
+            "starts_at": "2026-12-03T11:00:00+00:00",
+            "service_id": "fd3c4e0f-c798-4e50-83b1-afbe5d227f24",
+            "client_name": "Ana Pérez",
+            "service_name": "Lifting"
+        },
+        {
+            "id": "3a6ba521-69ae-4fa1-92a7-bbb8916f2d52",
+            "notes": null,
+            "source": "admin",
+            "status": "confirmed",
+            "client_id": "629bda69-50ef-4cce-bdcf-dcfbabf43b64",
+            "starts_at": "2026-11-28T15:03:40.201094+00:00",
+            "service_id": "fd3c4e0f-c798-4e50-83b1-afbe5d227f24",
+            "client_name": "Ana Pérez",
+            "service_name": "Lifting"
+        }
+    ],
+    "has_business": true,
+    "business_hours": [
+        {
+            "enabled": true,
+            "weekday": 1,
+            "opens_at": "08:00:00",
+            "closes_at": "21:00:00",
+            "updated_at": "2026-11-26T15:03:40.121087+00:00",
+            "business_id": "944d9a28-ebf9-47e5-8d7e-da7860ff87ae"
+        },
+        {
+            "enabled": true,
+            "weekday": 2,
+            "opens_at": "08:00:00",
+            "closes_at": "21:00:00",
+            "updated_at": "2026-11-26T15:03:40.121087+00:00",
+            "business_id": "944d9a28-ebf9-47e5-8d7e-da7860ff87ae"
+        },
+        {
+            "enabled": true,
+            "weekday": 3,
+            "opens_at": "08:00:00",
+            "closes_at": "21:00:00",
+            "updated_at": "2026-11-26T15:03:40.121087+00:00",
+            "business_id": "944d9a28-ebf9-47e5-8d7e-da7860ff87ae"
+        },
+        {
+            "enabled": true,
+            "weekday": 4,
+            "opens_at": "08:00:00",
+            "closes_at": "21:00:00",
+            "updated_at": "2026-11-26T15:03:40.121087+00:00",
+            "business_id": "944d9a28-ebf9-47e5-8d7e-da7860ff87ae"
+        },
+        {
+            "enabled": true,
+            "weekday": 5,
+            "opens_at": "08:00:00",
+            "closes_at": "21:00:00",
+            "updated_at": "2026-11-26T15:03:40.121087+00:00",
+            "business_id": "944d9a28-ebf9-47e5-8d7e-da7860ff87ae"
+        },
+        {
+            "enabled": true,
+            "weekday": 6,
+            "opens_at": "08:00:00",
+            "closes_at": "21:00:00",
+            "updated_at": "2026-11-26T15:03:40.121087+00:00",
+            "business_id": "944d9a28-ebf9-47e5-8d7e-da7860ff87ae"
+        },
+        {
+            "enabled": true,
+            "weekday": 7,
+            "opens_at": "08:00:00",
+            "closes_at": "21:00:00",
+            "updated_at": "2026-11-26T15:03:40.121087+00:00",
+            "business_id": "944d9a28-ebf9-47e5-8d7e-da7860ff87ae"
+        }
+    ],
+    "recent_activity": [
+        {
+            "client_name": "Ana Pérez",
+            "final_price": 20000.00,
+            "performed_at": "2026-11-26T15:03:40.121087+00:00",
+            "service_name": "Lifting"
+        },
+        {
+            "client_name": "Ana Pérez",
+            "final_price": 20000.00,
+            "performed_at": "2026-11-26T15:03:40.121087+00:00",
+            "service_name": "Lifting"
+        },
+        {
+            "client_name": "Ana Pérez",
+            "final_price": 20000.00,
+            "performed_at": "2026-11-26T15:03:40.121087+00:00",
+            "service_name": "Lifting"
+        },
+        {
+            "client_name": "Ana Pérez",
+            "final_price": 20000.00,
+            "performed_at": "2026-11-26T15:03:40.121087+00:00",
+            "service_name": "Lifting"
+        },
+        {
+            "client_name": "Ana Pérez",
+            "final_price": 20000.00,
+            "performed_at": "2026-11-26T15:03:40.121087+00:00",
+            "service_name": "Lifting"
+        },
+        {
+            "client_name": "Ana Pérez",
+            "final_price": 16000.00,
+            "performed_at": "2026-11-26T15:03:40.121087+00:00",
+            "service_name": "Lifting"
+        },
+        {
+            "client_name": "Ana Pérez",
+            "final_price": 20000.00,
+            "performed_at": "2026-11-26T15:03:40.121087+00:00",
+            "service_name": "Lifting"
+        }
+    ],
+    "reminder_client_ids": [
+    ]
+}

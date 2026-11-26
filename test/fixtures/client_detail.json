@@ -1,0 +1,83 @@
+{
+    "history": [
+        {
+            "id": "1d749354-9bd5-454a-8dad-9a01166f3d78",
+            "base_price": 20000.00,
+            "service_id": "fd3c4e0f-c798-4e50-83b1-afbe5d227f24",
+            "final_price": 20000.00,
+            "performed_at": "2026-11-26T15:03:40.121087+00:00",
+            "discount_amount": 0.00,
+            "loyalty_points_earned": 1,
+            "service_name_snapshot": "Lifting"
+        },
+        {
+            "id": "f246196b-62c7-4816-af96-4c7d31213a22",
+            "base_price": 20000.00,
+            "service_id": "fd3c4e0f-c798-4e50-83b1-afbe5d227f24",
+            "final_price": 20000.00,
+            "performed_at": "2026-11-26T15:03:40.121087+00:00",
+            "discount_amount": 0.00,
+            "loyalty_points_earned": 1,
+            "service_name_snapshot": "Lifting"
+        },
+        {
+            "id": "13fdc508-5b97-43e9-8299-f38dfa25e67e",
+            "base_price": 20000.00,
+            "service_id": "fd3c4e0f-c798-4e50-83b1-afbe5d227f24",
+            "final_price": 20000.00,
+            "performed_at": "2026-11-26T15:03:40.121087+00:00",
+            "discount_amount": 0.00,
+            "loyalty_points_earned": 1,
+            "service_name_snapshot": "Lifting"
+        },
+        {
+            "id": "bc0cdc7c-65c0-4c77-bd31-9bd68cc6a35b",
+            "base_price": 20000.00,
+            "service_id": "fd3c4e0f-c798-4e50-83b1-afbe5d227f24",
+            "final_price": 20000.00,
+            "performed_at": "2026-11-26T15:03:40.121087+00:00",
+            "discount_amount": 0.00,
+            "loyalty_points_earned": 1,
+            "service_name_snapshot": "Lifting"
+        },
+        {
+            "id": "4e4f32b0-ae0b-4d35-943b-154bbe0388b1",
+            "base_price": 20000.00,
+            "service_id": "fd3c4e0f-c798-4e50-83b1-afbe5d227f24",
+            "final_price": 20000.00,
+            "performed_at": "2026-11-26T15:03:40.121087+00:00",
+            "discount_amount": 0.00,
+            "loyalty_points_earned": 1,
+            "service_name_snapshot": "Lifting"
+        },
+        {
+            "id": "bf5ceffe-17c7-4dbb-840b-3604fc647b1b",
+            "base_price": 20000.00,
+            "service_id": "fd3c4e0f-c798-4e50-83b1-afbe5d227f24",
+            "final_price": 16000.00,
+            "performed_at": "2026-11-26T15:03:40.121087+00:00",
+            "discount_amount": 4000.00,
+            "loyalty_points_earned": 1,
+            "service_name_snapshot": "Lifting"
+        },
+        {
+            "id": "74cd9b3a-aee0-4c52-bde3-6122ebfba6fe",
+            "base_price": 20000.00,
+            "service_id": "fd3c4e0f-c798-4e50-83b1-afbe5d227f24",
+            "final_price": 20000.00,
+            "performed_at": "2026-11-26T15:03:40.121087+00:00",
+            "discount_amount": 0.00,
+            "loyalty_points_earned": 1,
+            "service_name_snapshot": "Lifting"
+        }
+    ],
+    "rewards": [
+        {
+            "id": "43cb4319-9670-4489-98f5-b847ce26a4a6",
+            "status": "redeemed",
+            "issued_at": "2026-11-26T15:03:40.121087+00:00",
+            "redeemed_at": "2026-11-26T15:03:40.121087+00:00",
+            "reward_percent_snapshot": 20.00
+        }
+    ]
+}

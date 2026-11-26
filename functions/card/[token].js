@@ -1,3 +1,5 @@
+import { brand, escapeHtml } from "../_brand.js";
+
 function validUuid(value) {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
     value || ""
@@ -24,6 +26,8 @@ export async function onRequestGet(context) {
   //
   // Instead, return a tiny Flutter app shell directly. The browser keeps the
   // original /card/<token> URL, so GoRouter receives the client token.
+  const b = brand(context.env);
+  const name = escapeHtml(b.shortName);
   const manifestUrl = `/card-manifest/${encodeURIComponent(token)}`;
 
   const html = `<!DOCTYPE html>
@@ -32,16 +36,16 @@ export async function onRequestGet(context) {
   <base href="/">
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="Mi tarjeta Bellamia, beneficios y turnos">
-  <meta name="theme-color" content="#8F5E78">
+  <meta name="description" content="Mi tarjeta ${name}, beneficios y turnos">
+  <meta name="theme-color" content="${b.color}">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="Bellamia">
+  <meta name="apple-mobile-web-app-title" content="${name}">
   <link rel="apple-touch-icon" href="/icons/Icon-192.png">
   <link rel="icon" type="image/png" href="/favicon.png">
   <link rel="manifest" href="${manifestUrl}">
-  <title>Bellamia</title>
+  <title>${name}</title>
   <script src="/push_bridge.js"></script>
 </head>
 <body>

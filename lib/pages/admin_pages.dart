@@ -317,10 +317,6 @@ class _AdminClientDetailPageState extends State<AdminClientDetailPage> {
       );
     }
 
-    final available = client.rewards
-        .where((r) => r.status == RewardStatus.available)
-        .toList();
-
     return AdminScaffold(
       appState: widget.appState,
       selectedIndex: 1,
@@ -665,8 +661,10 @@ class _AdminAppointmentsPageState
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadPriorityAppointment();
       _refreshAppointments();
+      // Changes arrive through Supabase Realtime (see AppState). This is
+      // only a safety net in case the realtime connection drops.
       _syncTimer = Timer.periodic(
-        const Duration(seconds: 3),
+        const Duration(seconds: 60),
         (_) => _refreshAppointments(),
       );
     });
@@ -1838,7 +1836,7 @@ class _AdminBusinessPageState
             title: const Text('Activar en iPhone/iPad'),
             content: const Text(
               'Primero abrí el menú Compartir de Safari, elegí '
-              '"Agregar a pantalla de inicio", abrí Bellamia desde '
+              '"Agregar a pantalla de inicio", abrí la app desde '
               'ese ícono y después tocá nuevamente Activar notificaciones.',
             ),
             actions: [
@@ -2171,7 +2169,7 @@ class _AdminBusinessPageState
                               }
                               if (env.isIos &&
                                   !env.isStandalone) {
-                                return 'En iPhone/iPad: agregá Bellamia a la pantalla de inicio.';
+                                return 'En iPhone/iPad: agregá la app a la pantalla de inicio.';
                               }
                               if (env.permission ==
                                   'granted') {

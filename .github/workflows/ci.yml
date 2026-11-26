@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop, "rebuild/**"]
+  pull_request:
+
+jobs:
+  database:
+    name: Database migrations + smoke test
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready --health-interval 5s
+          --health-timeout 5s --health-retries 10
+    env:
+      PGHOST: localhost
+      PGUSER: postgres
+      PGPASSWORD: postgres
+    steps:
+      - uses: actions/checkout@v4
+      - run: ./scripts/test_db.sh
+
+  app:
+    name: Flutter analyze + test + build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.50.1
+          cache: true
+      - run: flutter pub get
+      - run: flutter analyze --no-fatal-infos
+      - run: flutter test
+      - name: Build web (example config)
+        run: |
+          flutter build web --release --dart-define-from-file=config/example.json
+          dart run tool/apply_brand.dart config/example.json build/web

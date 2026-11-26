@@ -5,12 +5,12 @@ self.addEventListener("push", (event) => {
     data = event.data ? event.data.json() : {};
   } catch (_) {
     data = {
-      title: "Bellamia",
+      title: "{{APP_SHORT_NAME}}",
       body: event.data ? event.data.text() : "Tenés una nueva notificación.",
     };
   }
 
-  const title = data.title || "Bellamia Lashes Studio";
+  const title = data.title || "{{APP_NAME}}";
   const url = data.url || "/";
 
   event.waitUntil(
@@ -74,7 +74,7 @@ self.addEventListener("notificationclick", (event) => {
         }
       }
 
-      // No matching Bellamia window exists: open the exact notification URL.
+      // No matching app window exists: open the exact notification URL.
       if (clients.openWindow) {
         return clients.openWindow(targetUrl.href);
       }

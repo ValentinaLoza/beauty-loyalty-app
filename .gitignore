@@ -10,3 +10,9 @@ coverage/
 .DS_Store
 Thumbs.db
 config/local.json
+.wrangler/
+.env
+.env.*
+!.env.example
+.dev.vars
+supabase/.temp/

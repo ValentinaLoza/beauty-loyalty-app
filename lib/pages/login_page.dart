@@ -49,10 +49,10 @@ class _LoginPageState extends State<LoginPage> {
                 child: Container(
                   padding: const EdgeInsets.all(26),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.95),
+                    color: Colors.white.withValues(alpha: 0.95),
                     borderRadius: BorderRadius.circular(30),
                     boxShadow: <BoxShadow>[
-                      BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 36, offset: const Offset(0, 18)),
+                      BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 36, offset: const Offset(0, 18)),
                     ],
                   ),
                   child: Column(

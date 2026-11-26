@@ -89,7 +89,7 @@ class StatCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(22),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.035),
+            color: Colors.black.withValues(alpha: 0.035),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -203,7 +203,7 @@ class LoyaltyCardWidget extends StatelessWidget {
                   shape: BoxShape.circle,
                   color: index < completed
                       ? Colors.white
-                      : Colors.white.withOpacity(.18),
+                      : Colors.white.withValues(alpha: .18),
                 ),
                 child: Icon(
                   index < completed ? Icons.check : Icons.auto_awesome,
@@ -224,7 +224,7 @@ class LoyaltyCardWidget extends StatelessWidget {
                 ? 'Tenés ${client.availableRewards} beneficio disponible'
                 : 'Faltan ${pointsRequired - client.points} para '
                     '${rewardPercent.toStringAsFixed(0)}% OFF',
-            style: TextStyle(color: Colors.white.withOpacity(.88)),
+            style: TextStyle(color: Colors.white.withValues(alpha: .88)),
           ),
         ],
       ),

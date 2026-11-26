@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -24,9 +26,11 @@ Future<void> main() async {
   );
 
   final appState = AppState(Supabase.instance.client);
-  await appState.initialize();
 
+  // Draw immediately. The admin dashboard loads in the background and the
+  // app shows a loading screen meanwhile, instead of a blank page.
   runApp(BeautyLoyaltyApp(appState: appState));
+  unawaited(appState.initialize());
 }
 
 class _MissingConfigurationApp extends StatelessWidget {

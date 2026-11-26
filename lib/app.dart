@@ -35,7 +35,7 @@ class _MissingClientTokenPage extends StatelessWidget {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'Abrí nuevamente el enlace privado que te envió Bellamia '
+                  'Abrí nuevamente el enlace privado que te envió el negocio '
                   'y, cuando veas tu tarjeta, agregala a la pantalla de inicio.',
                   textAlign: TextAlign.center,
                 ),
@@ -107,21 +107,21 @@ class _BeautyLoyaltyAppState extends State<BeautyLoyaltyApp> {
         // Normal browser login/setup.
         GoRoute(
           path: '/login',
-          builder: (_, __) => LoginPage(appState: widget.appState),
+          builder: (_, _) => LoginPage(appState: widget.appState),
         ),
         GoRoute(
           path: '/setup',
-          builder: (_, __) => BusinessSetupPage(appState: widget.appState),
+          builder: (_, _) => BusinessSetupPage(appState: widget.appState),
         ),
 
         // Installed ADMIN PWA keeps all auth/setup navigation inside /admin.
         GoRoute(
           path: '/admin/login',
-          builder: (_, __) => LoginPage(appState: widget.appState),
+          builder: (_, _) => LoginPage(appState: widget.appState),
         ),
         GoRoute(
           path: '/admin/setup',
-          builder: (_, __) => BusinessSetupPage(appState: widget.appState),
+          builder: (_, _) => BusinessSetupPage(appState: widget.appState),
         ),
 
         // Administration uses one persistent shell. Bottom navigation is
@@ -279,31 +279,70 @@ class _BeautyLoyaltyAppState extends State<BeautyLoyaltyApp> {
     );
   }
 
+  String? _themeColorHex;
+  ThemeData? _theme;
+
+  // ColorScheme.fromSeed is expensive. The app redraws on every data change,
+  // so the theme is rebuilt only when the business color actually changes.
+  ThemeData _themeFor(String colorHex) {
+    final cached = _theme;
+    if (cached != null && colorHex == _themeColorHex) return cached;
+
+    final theme = ThemeData(
+      useMaterial3: true,
+      colorScheme: ColorScheme.fromSeed(seedColor: colorFromHex(colorHex)),
+      scaffoldBackgroundColor: const Color(0xFFFFF9FB),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(18),
+          borderSide: BorderSide.none,
+        ),
+      ),
+    );
+    _themeColorHex = colorHex;
+    _theme = theme;
+    return theme;
+  }
+
+  static bool _isPublicPath(String path) =>
+      path.startsWith('/card/') ||
+      path.startsWith('/c/') ||
+      path == '/client' ||
+      path == '/client/index.html';
+
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: widget.appState,
-      builder: (_, __) {
-        final primary = colorFromHex(
+      builder: (_, _) {
+        final theme = _themeFor(
           widget.appState.business?.primaryColorHex ?? '#8F5E78',
         );
+        final title =
+            widget.appState.business?.name ?? AppConfig.fallbackTitle;
+
+        // While the admin dashboard loads, show a loading screen instead of
+        // redirecting to setup/login too early. Client cards never wait.
+        if (!widget.appState.initialized &&
+            widget.appState.isAuthenticated &&
+            !_isPublicPath(Uri.base.path)) {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: title,
+            theme: theme,
+            home: const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            ),
+          );
+        }
+
         return MaterialApp.router(
           debugShowCheckedModeBanner: false,
-          title: widget.appState.business?.name ?? AppConfig.fallbackTitle,
+          title: title,
           routerConfig: _router,
-          theme: ThemeData(
-            useMaterial3: true,
-            colorScheme: ColorScheme.fromSeed(seedColor: primary),
-            scaffoldBackgroundColor: const Color(0xFFFFF9FB),
-            inputDecorationTheme: InputDecorationTheme(
-              filled: true,
-              fillColor: Colors.white,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(18),
-                borderSide: BorderSide.none,
-              ),
-            ),
-          ),
+          theme: theme,
         );
       },
     );

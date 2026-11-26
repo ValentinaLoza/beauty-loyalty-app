@@ -1,14 +1,14 @@
 {
-  "name": "Bellamia Lashes Studio — Administración",
-  "short_name": "Bellamia Admin",
+  "name": "{{APP_NAME}} — Administración",
+  "short_name": "{{APP_SHORT_NAME}} Admin",
   "id": "/admin",
   "start_url": "/admin",
   "scope": "/admin",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#FFF9FB",
-  "theme_color": "#8F5E78",
-  "description": "Administración de Bellamia Lashes Studio",
+  "theme_color": "{{THEME_COLOR}}",
+  "description": "Administración de {{APP_NAME}}",
   "icons": [
     {
       "src": "icons/Icon-192.png",

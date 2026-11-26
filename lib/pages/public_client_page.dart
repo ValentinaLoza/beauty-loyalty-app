@@ -93,8 +93,11 @@ class _PublicClientPageState extends State<PublicClientPage>
 
     if (selectedIndex != 1) return;
 
+    // Clients have no login, so there is no realtime channel for them.
+    // A light poll while the appointments tab is open is enough: every 3 s
+    // was a full card download plus a redraw, draining battery and data.
     _appointmentSyncTimer = Timer.periodic(
-      const Duration(seconds: 3),
+      const Duration(seconds: 20),
       (_) => _loadCard(silent: true),
     );
   }
@@ -333,7 +336,7 @@ class _CardTab extends StatelessWidget {
                   ? 'Este dispositivo puede recibir avisos de '
                       'turnos y beneficios.'
                   : env.isIos && !env.isStandalone
-                      ? 'En iPhone agregá Bellamia a la pantalla '
+                      ? 'En iPhone agregá esta tarjeta a la pantalla '
                           'de inicio para activar notificaciones.'
                       : 'Te avisamos cuando confirmen o cambien '
                           'tu turno y cuando tengas un beneficio.',
