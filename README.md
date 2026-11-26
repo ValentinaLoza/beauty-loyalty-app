@@ -45,9 +45,11 @@ secret key.
 
 ### 1. Base de datos (Supabase)
 
-- **Base existente (Bellamia, en producción):** ejecutar sólo
+- **Base existente creada con una versión anterior:** ejecutar sólo
   `supabase/migrations/015_v3_performance_and_fixes.sql` en
   *SQL Editor*. Es seguro e idempotente: no borra ni cambia datos.
+  (El proyecto actual de Bellamia, `mcnpbfuevvjxnikuqjvg`, ya está
+  completo: no hay que ejecutar nada.)
 - **Negocio nuevo:** crear un proyecto Supabase y ejecutar en orden todas
   las migraciones de `supabase/migrations/` (los números 002–004 no
   existen; es normal). Después, crear la usuaria administradora en
@@ -55,8 +57,14 @@ secret key.
 
 ### 2. Configuración
 
-Copiar `config/example.json` como `config/local.json` (no se sube a Git) y
-completar:
+**Bellamia:** su configuración ya está guardada en `config/bellamia.json`
+(proyecto Supabase `mcnpbfuevvjxnikuqjvg`). Sólo contiene datos públicos
+(la URL y la *publishable key* también van dentro de la app publicada).
+Para compilar: `./scripts/build_web.sh config/bellamia.json`.
+**Nunca** agregues a este archivo una *secret key* ni la `service_role`.
+
+**Otro negocio:** copiar `config/example.json` como `config/local.json`
+(no se sube a Git) y completar:
 
 | Clave | Ejemplo | Para qué |
 | --- | --- | --- |
@@ -77,7 +85,7 @@ flutter run -d chrome --dart-define-from-file=config/local.json
 ### 4. Compilar y publicar
 
 ```bash
-./scripts/build_web.sh            # Windows: .\scripts\build_web.ps1
+./scripts/build_web.sh config/bellamia.json   # Windows: .\scripts\build_web.ps1 config/bellamia.json
 npx wrangler pages deploy build/web --project-name=bellamialashesstudio
 ```
 
