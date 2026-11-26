@@ -8,9 +8,11 @@ class BusinessRecord {
     required this.phone,
     required this.logoUrl,
     required this.appointmentSlotMinutes,
+    this.lastBackupAt,
   });
 
   final String id;
+  DateTime? lastBackupAt;
   String name;
   String primaryColorHex;
   String phone;
@@ -27,6 +29,9 @@ class BusinessRecord {
       logoUrl: map['logo_url'] as String? ?? '',
       appointmentSlotMinutes:
           (map['appointment_slot_minutes'] as num?)?.toInt() ?? 30,
+      lastBackupAt: map['last_backup_at'] == null
+          ? null
+          : DateTime.parse(map['last_backup_at'] as String),
     );
   }
 }

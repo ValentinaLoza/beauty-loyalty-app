@@ -29,6 +29,20 @@ class _BusinessSetupPageState extends State<BusinessSetupPage> {
     );
   }
 
+  Future<void> restore() async {
+    final result = await widget.appState.restoreBackupFromFile();
+    if (!mounted || result == null) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Copia restaurada: ${result['clients']} clientas, '
+          '${result['service_records']} servicios y '
+          '${result['appointments']} turnos.',
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -73,6 +87,21 @@ class _BusinessSetupPageState extends State<BusinessSetupPage> {
                       FilledButton(
                         onPressed: widget.appState.busy ? null : save,
                         child: const Padding(padding: EdgeInsets.symmetric(vertical: 12), child: Text('Crear emprendimiento')),
+                      ),
+                      const SizedBox(height: 20),
+                      const Divider(),
+                      const SizedBox(height: 12),
+                      const Text(
+                        '¿Ya tenías el negocio cargado en otro proyecto? '
+                        'Podés recuperarlo con el archivo de copia de seguridad.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.black54),
+                      ),
+                      const SizedBox(height: 10),
+                      OutlinedButton.icon(
+                        onPressed: widget.appState.busy ? null : restore,
+                        icon: const Icon(Icons.restore),
+                        label: const Padding(padding: EdgeInsets.symmetric(vertical: 12), child: Text('Restaurar copia de seguridad')),
                       ),
                       const SizedBox(height: 8),
                       TextButton(onPressed: widget.appState.logout, child: const Text('Cerrar sesión')),

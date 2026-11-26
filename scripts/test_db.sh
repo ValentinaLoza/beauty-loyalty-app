@@ -13,4 +13,6 @@ for f in supabase/migrations/*.sql; do
   sed 's/^create extension if not exists pg_cron;//' "$f" |
     psql -q -v ON_ERROR_STOP=1 -d "$DB" -f -
 done
-psql -q -v ON_ERROR_STOP=1 -d "$DB" -f supabase/tests/10_smoke.sql
+for t in supabase/tests/[1-9]*.sql; do
+  psql -q -v ON_ERROR_STOP=1 -d "$DB" -f "$t"
+done

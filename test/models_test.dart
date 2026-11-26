@@ -94,4 +94,14 @@ void main() {
       expect(rewards.single.percent, 20);
     });
   });
+
+  test('business keeps the last backup date (v3.1)', () {
+    final business = BusinessRecord.fromMap({
+      'id': 'b1',
+      'name': 'Test',
+      'last_backup_at': '2026-11-20T10:00:00+00:00',
+    });
+    expect(business.lastBackupAt, DateTime.utc(2026, 11, 20, 10));
+    expect(BusinessRecord.fromMap({'id': 'b2'}).lastBackupAt, isNull);
+  });
 }

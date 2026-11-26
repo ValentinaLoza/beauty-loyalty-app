@@ -13,6 +13,7 @@ import '../app_state.dart';
 import '../models.dart';
 import '../push_notifications.dart';
 import '../widgets.dart';
+import 'backup_card.dart';
 
 Future<bool> confirmDanger(
   BuildContext context, {
@@ -76,6 +77,10 @@ class AdminDashboardPage extends StatelessWidget {
               subtitle: 'Actividad, métricas y oportunidades del negocio.',
             ),
             const SizedBox(height: 18),
+            if (BackupCard.isDue(appState)) ...[
+              BackupCard(appState: appState),
+              const SizedBox(height: 18),
+            ],
             LayoutBuilder(builder: (_, constraints) {
               final width = (constraints.maxWidth - 12) / 2;
               return Wrap(
@@ -2207,6 +2212,8 @@ class _AdminBusinessPageState
               ),
             ),
           ),
+          const SizedBox(height: 20),
+          BackupCard(appState: widget.appState),
           const SizedBox(height: 20),
           Text(
             'Archivados',

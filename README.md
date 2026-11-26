@@ -34,7 +34,7 @@ secret key.
 | `lib/` | App Flutter (`app_state.dart` concentra el acceso a Supabase) |
 | `web/` | HTML, manifiestos PWA y service worker de push, con marcadores de marca |
 | `functions/` | Cloudflare Pages Functions: enlaces y manifiestos de la tarjeta |
-| `supabase/migrations/` | Esquema de la base, en orden (`001` … `015`) |
+| `supabase/migrations/` | Esquema de la base, en orden (`001` … `016`) |
 | `supabase/functions/push-dispatch/` | Edge Function que envía las notificaciones |
 | `supabase/tests/` | Prueba automática de la base |
 | `supabase/scripts/` | SQL de diagnóstico y de limpieza manual (no son migraciones) |
@@ -51,7 +51,7 @@ secret key.
   (El proyecto actual de Bellamia, `mcnpbfuevvjxnikuqjvg`, ya está
   completo: no hay que ejecutar nada.)
 - **Negocio nuevo:** crear un proyecto Supabase y ejecutar en orden todas
-  las migraciones de `supabase/migrations/` (los números 002–004 no
+  las migraciones de `supabase/migrations/` (001 a 016; los números 002–004 no
   existen; es normal). Después, crear la usuaria administradora en
   *Authentication → Users*. En el primer ingreso la app crea el negocio.
 
@@ -101,8 +101,14 @@ ese archivo.
 
 ### 5. Notificaciones push
 
-Ver `docs/SETUP_ORIGINAL.md` (Edge Function `push-dispatch`, claves VAPID
-como secretos de Supabase y `supabase/config.push.toml.snippet`).
+Paso a paso en `docs/PUSH_SETUP.md`.
+
+### 6. Copias de seguridad
+
+*Negocio → Copia de seguridad → Descargar copia* baja todos los datos del
+negocio. Para recuperarlos en un proyecto nuevo: crear la base (paso 1),
+crear la usuaria, entrar y tocar *Restaurar copia de seguridad*.
+Detalle en `docs/changelog/CAMBIOS_V3.1.md`.
 
 ## Pruebas
 
@@ -126,6 +132,7 @@ GitHub Actions corre ambas en cada push (`.github/workflows/ci.yml`).
 
 Más detalle en `docs/BRANDING_AND_REUSE.md`.
 
-## Cambios de la v3
+## Cambios
 
-Ver `docs/changelog/CAMBIOS_V3.0.md`.
+`docs/changelog/CAMBIOS_V3.0.md` (velocidad y correcciones) y
+`docs/changelog/CAMBIOS_V3.1.md` (copias de seguridad).

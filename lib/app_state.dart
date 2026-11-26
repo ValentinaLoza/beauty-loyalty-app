@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 
+import 'backup_file.dart';
 import 'models.dart';
 import 'push_notifications.dart';
 
@@ -1065,6 +1066,79 @@ class AppState extends ChangeNotifier {
   void dispose() {
     _stopRealtime();
     super.dispose();
+  }
+
+  /// Downloads every record of the business as a .json file.
+  Future<bool> downloadBackup() async {
+    final current = business;
+    if (current == null) return false;
+
+    try {
+      final raw = await supabase.rpc('export_business_backup');
+      final now = DateTime.now();
+      final slug = current.name
+          .toLowerCase()
+          .replaceAll(RegExp(r'[^a-z0-9]+'), '-')
+          .replaceAll(RegExp(r'^-|-$'), '');
+      final date = '${now.year}-${now.month.toString().padLeft(2, '0')}-'
+          '${now.day.toString().padLeft(2, '0')}';
+
+      downloadTextFile(
+        'copia-${slug.isEmpty ? 'negocio' : slug}-$date.json',
+        const JsonEncoder.withIndent(' ').convert(raw),
+      );
+
+      current.lastBackupAt = now;
+      errorMessage = null;
+      notifyListeners();
+      return true;
+    } catch (error) {
+      errorMessage = 'No se pudo descargar la copia: $error';
+      notifyListeners();
+      return false;
+    }
+  }
+
+  /// Asks for a backup file and restores it. Only for a user that has no
+  /// business yet (a new project). Returns a summary, or null.
+  Future<Map<String, dynamic>?> restoreBackupFromFile() async {
+    final text = await pickTextFile();
+    if (text == null) return null;
+
+    busy = true;
+    errorMessage = null;
+    notifyListeners();
+
+    try {
+      final Object? decoded;
+      try {
+        decoded = jsonDecode(text);
+      } on FormatException {
+        errorMessage = 'Ese archivo no es una copia de seguridad.';
+        return null;
+      }
+
+      final raw = await supabase.rpc(
+        'restore_business_backup',
+        params: {'p_backup': decoded},
+      );
+      await refreshAdminData();
+      return Map<String, dynamic>.from(raw as Map);
+    } catch (error) {
+      final text = '$error';
+      errorMessage = text.contains('INVALID_BACKUP_FILE')
+          ? 'Ese archivo no es una copia de seguridad válida.'
+          : text.contains('RESTORE_ONLY_FOR_USER_WITHOUT_BUSINESS')
+              ? 'Esta cuenta ya tiene un negocio: la copia sólo se '
+                  'restaura en una cuenta nueva.'
+              : text.contains('BUSINESS_ALREADY_EXISTS')
+                  ? 'Ese negocio ya existe en esta base.'
+                  : 'No se pudo restaurar la copia: $error';
+      return null;
+    } finally {
+      busy = false;
+      notifyListeners();
+    }
   }
 
   Future<bool> registerAdminPushSubscription(
