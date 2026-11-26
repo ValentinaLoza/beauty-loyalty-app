@@ -1,0 +1,8 @@
+{
+  "SUPABASE_URL": "https://TU-PROYECTO.supabase.co",
+  "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_...",
+  "APP_TITLE": "Nombre del negocio",
+  "APP_SHORT_NAME": "Nombre corto",
+  "THEME_COLOR": "#8F5E78",
+  "WEB_PUSH_VAPID_PUBLIC_KEY": ""
+}
