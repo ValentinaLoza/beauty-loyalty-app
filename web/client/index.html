@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base href="/">
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta
+    name="description"
+    content="Mi tarjeta Bellamia, beneficios y turnos">
+
+  <meta name="theme-color" content="#8F5E78">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta
+    name="apple-mobile-web-app-status-bar-style"
+    content="default">
+  <meta
+    name="apple-mobile-web-app-title"
+    content="Bellamia">
+
+  <link
+    rel="apple-touch-icon"
+    href="/icons/Icon-192.png">
+  <link rel="manifest" href="/client-manifest.json">
+
+  <title>Bellamia</title>
+
+  <script>
+    (function () {
+      const key = "bellamia_client_pwa_token";
+      const token =
+        new URLSearchParams(window.location.search).get("token") || "";
+
+      const valid =
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+          .test(token);
+
+      if (valid) {
+        localStorage.setItem(key, token);
+      }
+    })();
+  </script>
+
+  <script src="/push_bridge.js"></script>
+</head>
+<body>
+  <script src="/flutter_bootstrap.js" async></script>
+</body>
+</html>
